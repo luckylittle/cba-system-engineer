@@ -13,12 +13,12 @@ RUN virtualenv .
 RUN pip install -r requirements.txt
 
 # Bundle app source
-COPY app/ /usr/src/app
-COPY bin/ /usr/src/app
-COPY include/ /usr/src/app
-COPY lib/ /usr/src/app
-COPY testing/ /usr/src/app
+COPY app/ /usr/src/app/app/
+COPY bin/ /usr/src/app/bin/
+COPY include/ /usr/src/app/include/
+COPY lib/ /usr/src/app/lib/
+COPY testing/ /usr/src/app/testing/
 
 # Listen on port 5000 & run in the background
 EXPOSE 5000
-CMD [ "python /usr/src/app/app.py" ]
+CMD python app/app.py
