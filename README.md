@@ -11,43 +11,43 @@ This was created for an interview with Andrew Tenney from CBA.
 + Accordingly,we don’t want or need access to your AWS/Azure/DigitalOcean/whatever VPC. There’s nothing stopping you using these for yourself for the purposes of building out your submission, but PLEASE make sure that your submission does not include access keys or credentials.
 
 ### Solution:
-1. Clone this repo to your hard drive:
-```sh
+* Clone this repo to your hard drive:
+```
 $ cd; mkdir Projects; cd Projects
 $ git clone git@github.com:luckylittle/cba-system-engineer.git
 ```
 
-2. Install AWS CLI:
-```sh
+* Install AWS CLI:
+```
 $ pip install awscli
 ```
   * Note: On some versions of MacOSX, you will need to use following:
-```sh
-$ sudo pip install awscli --ignore-installed six
-```
+  ```
+  $ sudo pip install awscli --ignore-installed six
+  ```
 
-3. Configure AWS CLI:
-```sh
+* Configure AWS CLI:
+```
 $ aws configure
 AWS Access Key ID:          [********************] 
 AWS Secret Access Key:      [********************] 
 Default region name [None]: ap-southeast-2
 ```
 
-4. Create the stack, use your key pair name ('key_pair_name' below) as a parameter:
-```sh
+* Create the stack, use your key pair name ('key_pair_name' below) as a parameter:
+```
 $ aws cloudformation create-stack --stack-name cba-system-engineer --template-body file://cba-system-engineer.json --parameters ParameterKey=KeyName,ParameterValue=<key_pair_name>
 ```
 
-5. Wait for the stack to be provisioned (you can monitor it in the AWS Console -> CloudFormation -> Stacks)
+* Wait for the stack to be provisioned (you can monitor it in the 'AWS Console' -> 'CloudFormation' -> 'Stacks').
 
-6. Find the public IP of the ELB:
-```sh
+* Find the public IP of the ELB:
+```
 $ aws cloudformation describe-stacks --stack-name cba-system-engineer | grep OutputValue
 ```
 
-7. Testing:
-```sh
+* Testing:
+```
 $ curl http://<ELB-public-IP-address>/customers -v
 ```
 
