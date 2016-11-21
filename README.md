@@ -11,13 +11,26 @@ This was created for an interview with Andrew Tenney from CBA.
 + Accordingly,we don’t want or need access to your AWS/Azure/DigitalOcean/whatever VPC. There’s nothing stopping you using these for yourself for the purposes of building out your submission, but PLEASE make sure that your submission does not include access keys or credentials.
 
 ### Solution:
-1. Clone this repo:
+1. Clone this repo to your hard drive:
 ```sh
-$ git clone
+$ cd; mkdir Projects; cd Projects
+$ git clone git@github.com:luckylittle/cba-system-engineer.git
 ```
-2. Install aws-cli:
+2. Install AWS CLI:
 ```sh
 $ pip install awscli
+```
+  Note: On some versions of MacOSX, you will need to use following:
+  ```sh
+  $ sudo pip install awscli --ignore-installed six
+  ```
+3. Configure AWS CLI:
+```sh
+$ aws configure
+```
+4. Deploy the stack:
+```sh
+$ aws cloudformation deploy --template-file cba-system-engineer.json --stack-name cba-system-engineer
 ```
 
 ### Bootstraping code:

@@ -41,7 +41,17 @@
       "GroupDescription": "Enable HTTP access via port 5000 locked down to the ELB and SSH access",
       "SecurityGroupIngress": [{"IpProtocol": "tcp", "FromPort": "5000", "ToPort": "5000", "SourceSecurityGroupOwnerId": {"Fn::GetAtt": ["ELB", "SourceSecurityGroup.OwnerAlias"]}, "SourceSecurityGroupName": {"Fn::GetAtt": ["ELB", "SourceSecurityGroup.GroupName"]}}]}
     },
-	
+
+	  "PythonVPC" : {
+         "Type" : "AWS::EC2::VPC",
+         "Properties" : {
+            "CidrBlock" : "10.0.0.0/16",
+    	      "EnableDnsSupport" : "false",
+    	      "EnableDnsHostnames" : "false",
+            "InstanceTenancy" : "dedicated"
+         }
+    },
+    
     "ServerGroup": {
       "Type": "AWS::AutoScaling::AutoScalingGroup",
         "Properties": {
@@ -108,7 +118,7 @@
         }
       },
       "Properties": {
-        "ImageId": "ami-dc361ebf",
+        "ImageId": "ami-b73b63a0",
         "InstanceType": "t2.micro",
         "SecurityGroups": [{"Ref": "PythonSecurityGroup"}],
         "KeyName": {"Ref": "KeyName"},
