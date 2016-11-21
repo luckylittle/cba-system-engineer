@@ -92,7 +92,7 @@
                   " --stack ", { "Ref" : "AWS::StackName" },
                   " --resource Python ",
                   " --region ap-southeast-2\n",
-				          "runas=root\n"
+                  "runas=root\n"
                 ]]},          
                 "mode": "000400",
                 "owner": "root",
