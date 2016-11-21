@@ -19,6 +19,6 @@ COPY include/ /usr/src/app/include/
 COPY lib/ /usr/src/app/lib/
 COPY testing/ /usr/src/app/testing/
 
-# Listen on port 5000 & run in the background
+# Listen on port 5000
 EXPOSE 5000
-CMD python app/app.py
+# CMD python app/app.py

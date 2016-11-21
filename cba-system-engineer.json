@@ -26,7 +26,7 @@
           "Protocol": "HTTP"
         }],
         "HealthCheck": {
-          "Target": "HTTP:5000/",
+          "Target": "HTTP:5000/customers",
           "HealthyThreshold": "2",
           "UnhealthyThreshold": "10",
           "Interval": "30",
@@ -124,7 +124,7 @@
                        "sudo su ec2-user\n",
                        "sudo service docker restart\n",
                        "docker pull luckylittle/cba-system-engineer\n",
-                       "docker run -p 5000:5000 -d luckylittle/cba-system-engineer\n",
+                       "docker run -d -p 5000:5000 luckylittle/cba-system-engineer python app/app.py\n",
                        "sudo /opt/aws/bin/cfn-signal -e $?",
                        " --stack ", {"Ref": "AWS::StackName"},
                        " --resource ServerGroup",
