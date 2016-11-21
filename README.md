@@ -27,13 +27,21 @@ $ sudo pip install awscli --ignore-installed six
 3. Configure AWS CLI:
 ```sh
 $ aws configure
-AWS Access Key ID: [********************] 
-AWS Secret Access Key: [********************] 
+AWS Access Key ID:          [********************] 
+AWS Secret Access Key:      [********************] 
 Default region name [None]: ap-southeast-2
 ```
-4. Deploy the stack, use the key pair name as a parameter:
+4. Deploy the stack, use your key pair name <key_pair_name> as a parameter:
 ```sh
 $ aws cloudformation create-stack --stack-name cba-system-engineer --template-body file://cba-system-engineer.json --parameters ParameterKey=KeyName,ParameterValue=<key_pair_name>
+```
+5. Find the public IP of the ELB:
+```sh
+$ aws cloudformation describe-stacks --stack-name cba-system-engineer | grep OutputValue
+```
+6. Testing:
+```sh
+$ curl http://<ELB-public-IP-address>/customers -v
 ```
 
 ### Bootstraping code:
@@ -47,11 +55,6 @@ $ sudo service docker restart                                 # restarting the D
 $ docker pull luckylittle/cba-system-engineer                 # download the image from my Docker Hub repo
 $ docker run -p 5000:5000 -d luckylittle/cba-system-engineer  # run the container in the background and map port 5000
 <- cfn-signal ->
-```
-
-### Testing:
-```sh
-$ curl http://<ELB-public-IP-address>/customers -v
 ```
 
 ### Alternative Docker registry:
