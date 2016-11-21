@@ -16,6 +16,7 @@ This was created for an interview with Andrew Tenney from CBA.
 $ cd; mkdir Projects; cd Projects
 $ git clone git@github.com:luckylittle/cba-system-engineer.git
 ```
+
 2. Install AWS CLI:
 ```sh
 $ pip install awscli
@@ -24,6 +25,7 @@ $ pip install awscli
 ```sh
 $ sudo pip install awscli --ignore-installed six
 ```
+
 3. Configure AWS CLI:
 ```sh
 $ aws configure
@@ -31,15 +33,19 @@ AWS Access Key ID:          [********************]
 AWS Secret Access Key:      [********************] 
 Default region name [None]: ap-southeast-2
 ```
+
 4. Create the stack, use your key pair name ('key_pair_name' below) as a parameter:
 ```sh
 $ aws cloudformation create-stack --stack-name cba-system-engineer --template-body file://cba-system-engineer.json --parameters ParameterKey=KeyName,ParameterValue=<key_pair_name>
 ```
+
 5. Wait for the stack to be provisioned (you can monitor it in the AWS Console -> CloudFormation -> Stacks)
+
 6. Find the public IP of the ELB:
 ```sh
 $ aws cloudformation describe-stacks --stack-name cba-system-engineer | grep OutputValue
 ```
+
 7. Testing:
 ```sh
 $ curl http://<ELB-public-IP-address>/customers -v
