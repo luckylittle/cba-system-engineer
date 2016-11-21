@@ -11,7 +11,11 @@ This was created for an interview with Andrew Tenney from CBA.
 + Accordingly,we don’t want or need access to your AWS/Azure/DigitalOcean/whatever VPC. There’s nothing stopping you using these for yourself for the purposes of building out your submission, but PLEASE make sure that your submission does not include access keys or credentials.
 
 ### Solution:
-1. Install aws-cli:
+1. Clone this repo:
+```sh
+$ git clone
+```
+2. Install aws-cli:
 ```sh
 $ pip install awscli
 ```
@@ -20,7 +24,7 @@ $ pip install awscli
 ```sh
 $ sudo yum update -y aws-cfn-bootstrap                        # update the AWS CloudFormation Helper Scripts
 <- cfn-init ->
-$ sudo yum -y install docker                                  # install the Docker
+$ sudo yum -y install docker                                  # install the latest Docker
 $ sudo gpasswd -a ec2-user docker                             # add ec2-user to the docker group
 $ sudo su ec2-user                                            # workaround for logout/login after the ec2-user added to the group
 $ sudo service docker restart                                 # restarting the Docker service after the previous workaround
@@ -31,7 +35,14 @@ $ docker run -p 5000:5000 -d luckylittle/cba-system-engineer  # run the containe
 
 ### Testing:
 ```sh
-$ curl http://<ELB-public-IP-address>:5000/customers -v
+$ curl http://<ELB-public-IP-address>/customers -v
+```
+
+### Alternative Docker registry:
+```sh
+$ docker login <someregistry.example.com> 
+$ docker build -t <someregistry>/<image> .
+$ docker push <someregistry>/<image>
 ```
 
 ### Contributors
