@@ -31,9 +31,9 @@ AWS Access Key ID: [********************]
 AWS Secret Access Key: [********************] 
 Default region name [None]: ap-southeast-2
 ```
-4. Deploy the stack:
+4. Deploy the stack, use the key pair name as a parameter:
 ```sh
-$ aws cloudformation create-stack --stack-name cba-system-engineer --template-body file://cba-system-engineer.json
+$ aws cloudformation create-stack --stack-name cba-system-engineer --template-body file://cba-system-engineer.json --parameters ParameterKey=KeyName,ParameterValue=<key_pair_name>
 ```
 
 ### Bootstraping code:
