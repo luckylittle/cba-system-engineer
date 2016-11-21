@@ -1,0 +1,143 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  
+  "Description": "THIS IS FOR THE ODECEE INTERVIEW IN CBA",
+  
+  "Parameters": {
+    "KeyName": {
+     "Description": "Existing EC2 Key Pair to enable SSH access to the instances",
+     "Type": "AWS::EC2::KeyPair::KeyName",
+     "ConstraintDescription": "MUST BE THE NAME OF AN EXISTING KEYPAIR IN THE SYDNEY REGION!"
+    }
+  },
+  
+  "Mappings": {
+  },
+
+  "Resources": {
+    "ELB": {
+      "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+      "Properties": {
+      "CrossZone": "true",
+        "AvailabilityZones": {"Fn::GetAZs": ""},
+        "Listeners": [{
+          "LoadBalancerPort": "80",
+          "InstancePort": "5000",
+          "Protocol": "HTTP"
+        }],
+        "HealthCheck": {
+          "Target": "HTTP:5000/",
+          "HealthyThreshold": "2",
+          "UnhealthyThreshold": "10",
+          "Interval": "30",
+          "Timeout": "5"
+        }
+      }
+    },
+
+    "PythonSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+      "GroupDescription": "Enable HTTP access via port 5000 locked down to the ELB and SSH access",
+      "SecurityGroupIngress": [{"IpProtocol": "tcp", "FromPort": "5000", "ToPort": "5000", "SourceSecurityGroupOwnerId": {"Fn::GetAtt": ["ELB", "SourceSecurityGroup.OwnerAlias"]}, "SourceSecurityGroupName": {"Fn::GetAtt": ["ELB", "SourceSecurityGroup.GroupName"]}}]}
+    },
+	
+    "ServerGroup": {
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+        "Properties": {
+        "AvailabilityZones": {"Fn::GetAZs": ""},
+        "LaunchConfigurationName": {"Ref": "Python"},
+        "MinSize": "1",
+        "MaxSize": "1",
+        "LoadBalancerNames": [{"Ref": "ELB"}]
+        },
+     "CreationPolicy": {
+       "ResourceSignal": {
+       "Timeout": "PT5M",
+       "Count": "1"
+       }
+      },
+      "UpdatePolicy": {
+        "AutoScalingRollingUpdate": {
+        "MinInstancesInService": "1",
+        "MaxBatchSize": "1",
+        "PauseTime": "PT15M",
+        "WaitOnResourceSignals": "true"
+        }
+      }
+    },
+	      
+    "Python": {
+      "Type": "AWS::AutoScaling::LaunchConfiguration",
+      "Metadata": {
+        "AWS::CloudFormation::Init": {
+          "config": {
+            "files": {
+              "/etc/cfn/cfn-hup.conf": {
+                "content": {"Fn::Join": [ "", [
+                  "[main]\n",
+                  "stack=", {"Ref": "AWS::StackId"}, "\n",
+                  "region=ap-southeast-2\n"
+                ]]},
+                "mode": "000400",
+                "owner": "root",
+                "group": "root"
+              },
+              "/etc/cfn/hooks.d/cfn-auto-reloader.conf": {
+                "content": { "Fn::Join": [ "", [
+                  "[cfn-auto-reloader-hook]\n",
+                  "triggers=post.update\n",
+                  "path=Resources.Python.Metadata.AWS::CloudFormation::Init\n",
+                  "action=/opt/aws/bin/cfn-init -v ",
+                  " --stack ", { "Ref" : "AWS::StackName" },
+                  " --resource Python ",
+                  " --region ap-southeast-2\n",
+				          "runas=root\n"
+                ]]},          
+                "mode": "000400",
+                "owner": "root",
+                "group": "root"
+              }
+            },
+            "services": {
+              "sysvinit": {
+                "cfn-hup": {"enabled": "true", "ensureRunning": "true", "files": ["/etc/cfn/cfn-hup.conf", "/etc/cfn/hooks.d/cfn-auto-reloader.conf"]}
+              }
+            }
+          }
+        }
+      },
+      "Properties": {
+        "ImageId": "ami-dc361ebf",
+        "InstanceType": "t2.micro",
+        "SecurityGroups": [{"Ref": "PythonSecurityGroup"}],
+        "KeyName": {"Ref": "KeyName"},
+        "UserData": {"Fn::Base64": { "Fn::Join": ["", [
+                       "#!/bin/bash\n",
+                       "sudo yum update -y aws-cfn-bootstrap\n",
+                       "sudo /opt/aws/bin/cfn-init -v ",
+                       " --stack ", {"Ref": "AWS::StackName"},
+                       " --resource Python",
+                       " --region ap-southeast-2\n",
+                       "sudo yum -y install docker\n",
+                       "sudo gpasswd -a ec2-user docker\n",
+                       "sudo su ec2-user\n",
+                       "sudo service docker restart\n",
+                       "docker pull luckylittle/cba-system-engineer\n",
+                       "docker run -p 5000:5000 -d luckylittle/cba-system-engineer\n",
+                       "sudo /opt/aws/bin/cfn-signal -e $?",
+                       " --stack ", {"Ref": "AWS::StackName"},
+                       " --resource ServerGroup",
+                       " --region ap-southeast-2\n"
+        ]]}}
+      }
+    }
+  },
+
+  "Outputs": {
+    "WebsiteURL": {
+      "Value": {"Fn::Join": ["", ["http://", { "Fn::GetAtt": [ "ELB", "DNSName" ]}, "/" ]]},
+      "Description": "CUSTOMER ACCOUNT API INSIDE DOCKER BEHIND ELB!"
+    }
+  }
+}
